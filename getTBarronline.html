@@ -56,36 +56,7 @@ function reload(url){
 				for(i=1;i<12;i++){
 				_w_table_colspan("#datatable",i);
 				}
-				$('#lastweek').on("click",function(e){
-				$('#lastweek').unbind()
-				var cw=parseInt(jsobj.info.shName.split('-')[1])
-					padding=""
-					if(cw-1<10){padding="0"}
-					if(cw-1>0)
-						reload("./TBarr-17-"+padding+(cw-1)+".json")
-					else(alert("no more week."))
-							
-					e.stopPropagation();
-					return false;
-				})
-				
-				$('#nextweek').on("click",function(e){
-				$('#nextweek').unbind()
-				var cw=parseInt(jsobj.info.shName.split('-')[1])
-					padding=""
-					if(cw+1<10){padding="0"}
-					if(cw+1<34)
-						reload("./TBarr-17-"+padding+(cw+1)+".json")
-					else(alert("no more week."))
-				e.stopPropagation();
-				return false;
-				})
-				
-				$(".myTB").click(function(){
-					//nn=this.text()
-					//alert($(this).text())
-					$("<div id='modal' class='modal fade'></div>").html("<div class='modal-header'><H2>" + $(this).text() + "</H2></div><div class='modal-body'>" + getTB() +"</div><div class='modal-footer'><button class='btn' data-dismiss='modal' aria-hidden='true'>Close</button></div>").appendTo('body').end().modal("show");
-				})		
+
 			
 			
 			$('th').css("width","12.5%");
@@ -127,46 +98,8 @@ function reload(url){
 				da=d.getDate()
 				return y+"/"+m+"/"+da
 		}
-		function getTB(){
-		 mystr = "<BR>Here is demo info.<br>"
-		 $.each(fakeTBinfo,function(i,s){
-			mystr+=i+":"+s+"<br>"
-		 })
-		 return mystr;
-		}
-		
-		
-		var fakeTBinfo={
-			"Pump":"CB18-18",
-			"Rail":"HFR18",
-			"ECU":"EDC17CV44/54",
-			"Asker":"ESD2/Yh",
-			"HPP":"309/203mm"
-		}
-		/*
-		function isvalidJson(strName){
-			var $ifa = $('<iframe></iframe>').attr('id','ifa').attr('src',strName).css('display','none').appendTo('body');
-			r=false
-			setTimeout("donothing()",200)
-			try {
-				var jsobj=$.parseJSON($('#ifa').contents().find('pre').text());
-				$('#ifa').remove();
-				r=true;
-			}
-			catch(e){
-				$('#ifa').remove();
-			}
-			finally{
-				return r;
-			}
-		}
-		
-		function donothing(){
-			a=0;
-			a=a+1
-		}
 
-		*/
+
 </script>			
 
     <script type="text/javascript">
@@ -266,15 +199,7 @@ table.imagetable td {
 <div class="section">
 <div class="container" >
 <div class="container"><H2>ESD1 test bench arrangement system<img class="pull-right imgresponsive center-block" id="logopng" src="images/logo_bosch.gif"></H2></div>
-<div class="navbar">
-	<div class="navbar-inner">
-	<div class="container">
-	<ul class="nav">
-			<li><a href="javascript:return(false)" id="lastweek">&lt;&lt;</a></li><li><a href="javascript:return(false)" id="nextweek">&gt;&gt;</a></li>
-	</ul>
-	</div>
-	</div>
-</div>
+
 
 <div id="nav" class="navbar"><ul class=breadcrumb ><li><TIT></TIT></li></ul></div>
 
