@@ -1,0 +1,287 @@
+<html>
+
+<head>
+
+<script src="js/jquery-3.2.1.min.js"></script>
+
+<script src="/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/dataTables.bootstrap.css" />
+<script src="/js/bootstrap.min.js"></script>
+
+<script>
+function GetRequest() {    
+    var url = location.search;    
+    var theRequest = new Object();    
+    if (url.indexOf("?") != -1) {       
+        var str = url.substr(1);       
+        strs = str.split("&");       
+        for(var i = 0; i < strs.length; i ++) {          
+            theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+        }
+    }
+    return theRequest;
+}
+	Request = GetRequest();
+
+	$(document).ready(function(){
+
+		var url=""
+
+		if(Request["url"]==undefined){
+			url="TBarr.json";
+		}
+		else{
+			url=Request["url"];
+		}
+
+		getData(url);		
+		loadpending();	
+		})
+		function loadpending(){
+		
+		$.ajaxSettings.async = false;
+		$.getJSON("pending.json",function(jsobj){
+			str="<ol>"
+			$.each(jsobj,function(i,s){
+			str+="<li>"+s+"</li>"			
+			})
+			str+="</ol>"
+		})
+		$('#pending').html(str);
+		}
+		function getData(url){
+		$.ajaxSettings.async = false;
+		$('#plh').html("Please wait while loading data from server.");
+			try {
+				$.getJSON(url,function(jsobj){
+				var str="";
+				
+				str+="<table class='imagetable' id='datatable'><thead><tr>"
+				for (x=0;x<parseInt(jsobj.info.days)+1;x++){
+					if(x==0){
+						str+="<th></th>"
+					}
+					else{
+						str+="<th>" + getdaystring(jsobj.info.firstd,x-1) +"</th>"
+					}
+				}
+				str+="</tr></thead><tbody>"
+				$.each(jsobj.data,function(i,s){
+						str+="<tr>"
+						var days=""
+						$.each(s,function(j,d){
+							days+= "<td>"+proString(d)+"</td>";						
+						})
+						str += "<td class='myTB'>"+ i.replace("*","") +"</td>" + days + "</tr>";				
+					})
+				str+="</tbody></table>"
+				$('#plh').html(str);
+				
+				d=new Date(jsobj.info.firstd)
+				d=new Date(d.setDate(d.getDate()+parseInt(jsobj.info.days)-1))
+				y=d.getFullYear()
+				m=d.getMonth()+1
+				da=d.getDate()
+				d=y+"/"+m+"/"+da
+				$("TIT").html("Arrangement for "+jsobj.info.firstd + " to " + d)
+				for(i=1;i<12;i++){
+				_w_table_colspan("#datatable",i);
+				}
+				
+				$('#lastweek').unbind('click').click(function(){
+			
+				var cw=parseInt(jsobj.info.shName.split('-')[1])
+					padding=""
+					if(cw-1<10){padding="0"}
+					getData("TBarr-17-"+padding+(cw-1)+".json")
+
+				})
+				
+				$('#nextweek').unbind('click').click(function(){
+				
+				var cw=parseInt(jsobj.info.shName.split('-')[1])
+					padding=""
+					if(cw+1<10){padding="0"}
+					getData("TBarr-17-"+padding+(cw+1)+".json")	
+
+				})
+				
+				$(".myTB").click(function(){
+
+					$("<div id='modal' class='modal fade'></div>").html("<div class='modal-header'><H2>Mounting info for : " + $(this).text() + "</H2></div><div class='modal-body'>" + getTB() +"</div><div class='modal-footer'><button class='btn' data-dismiss='modal' aria-hidden='true'>Close</button></div>").appendTo('body').end().modal("show");
+				})
+			$('th').css("width","12.5%");
+			$('tr:contains(Quick)').hide();
+			});
+			$.ajaxSettings.async = true;
+			}
+			catch(e){
+				$('#plh').html("ERR:Cannot find json file you requested."+e);
+			}
+		}
+		
+		function getdaystring(strdate,offset){
+				d=new Date(strdate)
+				d=new Date(d.setDate(d.getDate()+offset))
+				y=d.getFullYear()
+				m=d.getMonth()+1
+				da=d.getDate()
+				return y+"/"+m+"/"+da
+		}
+		function getTB(){
+		 mystr = "<BR>Here is demo info.<br>"
+		 $.each(fakeTBinfo,function(i,s){
+			mystr+=i+":"+s+"<br>"
+		 })
+		 return mystr;
+		}
+		
+		
+		var fakeTBinfo={
+			"Pump":"CB18-18",
+			"Rail":"HFR18",
+			"ECU":"EDC17CV44/54",
+			"HPP":"309/203mm"
+		}
+
+</script>			
+
+    <script type="text/javascript">
+
+function _w_table_rowspan(_w_table_id,_w_table_colnum){
+    _w_table_firsttd = "";
+    _w_table_currenttd = "";
+    _w_table_SpanNum = 0;
+    _w_table_Obj = $(_w_table_id + " tr td:nth-child(" + _w_table_colnum + ")");
+    _w_table_Obj.each(function(i){
+        if(i==0){
+            _w_table_firsttd = $(this);
+            _w_table_SpanNum = 1;
+        }else{
+            _w_table_currenttd = $(this);
+			var s1=_w_table_firsttd.text().replace(/[\s]/img,"")
+			var s2=_w_table_currenttd.text().replace(/[\s]/img,"")
+            if(s1==s2){
+                _w_table_SpanNum++;
+                _w_table_currenttd.hide(); //remove();
+                _w_table_firsttd.attr("rowSpan",_w_table_SpanNum);
+            }else{
+                _w_table_firsttd = $(this);
+                _w_table_SpanNum = 1;
+            }
+        }
+    }); 
+}
+
+function _w_table_colspan(_w_table_id,_w_table_rownum,_w_table_maxcolnum){
+    if(_w_table_maxcolnum == void 0){_w_table_maxcolnum=0;}
+    _w_table_firsttd = "";
+    _w_table_currenttd = "";
+    _w_table_SpanNum = 0;
+    $(_w_table_id + " tr:nth-child(" + _w_table_rownum + ")").each(function(i){
+        _w_table_Obj = $(this).children();
+        _w_table_Obj.each(function(i){
+            if(i==0){
+                _w_table_firsttd = $(this);
+                _w_table_SpanNum = 1;
+            }else if((_w_table_maxcolnum>0)&&(i>_w_table_maxcolnum)){
+                return "";
+            }else{
+                _w_table_currenttd = $(this);
+                if(_w_table_firsttd.text()==_w_table_currenttd.text()){
+                    _w_table_SpanNum++;
+                    _w_table_currenttd.hide(); //remove();
+                    _w_table_firsttd.attr("colSpan",_w_table_SpanNum);
+                }else{
+                    _w_table_firsttd = $(this);
+                    _w_table_SpanNum = 1;
+                }
+            }
+        });
+    });
+}
+function proString(s){
+//return s
+return s.replace(/\s*-{1,2}>.*$/gim,"").replace(/[pP][\d]*\.[\d]?\s*/gim,"").replace(/\s*\/\s*\w*_\w*[,]?\s*\w*\s*$/gim,"")
+}
+
+
+</script>
+
+<style>
+TD{font-size:16px;
+height:60px;
+text-align:center;
+font-weight:bold;
+color:#00FF00;
+background:#000000;
+}
+table.imagetable {  
+    font-family: Bosch Office Sans;  
+    font-size:16px;  
+    color:#333333;  
+    border-width: 1px;  
+    border-color: #999999;  
+    border-collapse: collapse;  
+}  
+table.imagetable th {  
+    background:#b5cfd2;  
+    border-width: 1px;  
+    padding: 8px;  
+    border-style: solid;  
+    border-color: #999999;  
+}  
+table.imagetable td {  
+    
+    border-width: 1px;  
+    padding: 8px;  
+    border-style: solid;  
+    border-color: #999999;  
+} 
+.myTB{cursor:hand}
+
+.full-width {
+    width: 95%;
+    min-width: 95%;
+    max-width: 95%;
+}
+body{color:white;
+background:#000000}
+.modal{color:#000000}
+.page_foot{padding-top:20px}
+</style>
+
+
+</head>
+
+<body>
+
+<div class="container full-width">
+<div class="container full-width"><H2>ESD1 test bench online system<img class="pull-right imgresponsive center-block" id="logopng" src="images/logo_bosch.gif"></H2></div>
+<!--
+<div class="navbar">
+	<div class="navbar-inner">
+	<div class="container">
+	<ul class="nav">
+			<li><a href="javascript:return(false)" id="lastweek">&lt;&lt;</a></li><li><a href="javascript:return(false)" id="nextweek">&gt;&gt;</a></li>
+	</ul>
+	</div>
+	</div>
+</div>
+-->
+<!--<div id="nav" class="navbar"><ul class=breadcrumb ><li><TIT></TIT></li></ul></div>-->
+<div id="dbpath"></div>
+<div id="plh"></div>
+
+<div id="pending"></div>
+<div class="page_foot">Copy right RBCD/ESD1 2017 Designed by Tang Zhongji</div>
+
+</div>
+</div>
+
+
+
+</body>
+
+</html>

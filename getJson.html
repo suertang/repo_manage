@@ -1,0 +1,49 @@
+<html>
+
+<head>
+<script src="jquery-3.2.1.slim.min.js"></script>
+
+<script>
+
+	$(document).ready(function(){
+		$('#loadjson').click(function(){
+		var url=$('#jpath').val();
+		//create iframe and load data
+		var $ifa = $('<iframe></iframe>').attr('id','ifa').attr('src',url).css('display','none').appendTo('body');
+		//pro();
+		setTimeout("pro()",100);
+		
+		});
+		//setTimeout("pro()",500);
+		})
+		function pro(){
+			//sleep(1000);
+			//alert($('#ifa').contents().find('pre').text());
+			$('#ifa').ready(function(){
+			try {
+				var jsobj=$.parseJSON($('#ifa').contents().find('pre').text());
+					
+				var str="";
+				$.each(jsobj.streetCity,function(i,s){
+						str += 'Index ' + i + " : " + s + "\n<br>";				
+					})
+				$('#plh').html(str);
+				$('#ifa').remove();
+			}
+			catch(e){
+				$('#plh').html("ERR:Seems this is not a json file.<pre>"+$('#ifa').contents().find('pre').text()+"</pre>");
+				$('#ifa').remove();
+			}
+			})
+			//$('#ifa').remove();
+		}
+			
+</script>
+</head>
+
+<body>
+<div id="pre"><input id="jpath" type="text" value="my.json"><input id="loadjson" type="button" value="loadjson"></div>
+<div id="plh"></div>
+</body>
+
+</html>
