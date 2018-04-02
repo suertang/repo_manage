@@ -14,6 +14,31 @@ def makejson(data):
 		jsondata.append(j)
 	print(json.dumps(jsondata)[1:-1])
 
+
+def sub_query(conn,qc):#quick change over module
+	cur=conn.cursor()
+	qcid="203QCM"+qc[-2:]
+	sql="""
+	select b.GoodsCode,c.GoodsName,a.GoodsTxm, c.GoodsType as bbb
+	from dbo.tab_GoodsInfo as b  
+	LEFT JOIN dbo.tab_GoodsKcWz as a ON a.GoodsTxm=b.GoodsTxm 
+	left join dbo.tab_GoodsCommon as c on c.GoodsBatch=b.GoodsCode 
+	left join dbo.tab_GoodsType as d on d.GoodsType=c.GoodsType 
+	where  RackID=?
+	AND c.GoodsType<6
+	AND a.StoreNum>0	
+	"""
+	rows=cur.execute(sql,qcid).fetchall()
+	r=""
+	for w in rows:
+			print("<TR>")		
+			for i in w:
+				print("<TD>"+i+"</TD>")
+			print("</TR>")
+
+
+
+
 def infoget(TB_no,conn):	
 	cur=conn.cursor()
 	sql="""
@@ -27,19 +52,21 @@ def infoget(TB_no,conn):
 
 	"""
 	sql_dev="""
-	select b.GoodsCode,c.GoodsName,a.GoodsTxm,c.GoodsType as GoodsTypeCode 
-	from dbo.tab_GoodsKcWz as a left join dbo.tab_GoodsInfo as b on b.GoodsTxm=a.GoodsTxm
-	left join dbo.tab_GoodsCommon as c on c.GoodsBatch=b.GoodsCode left join dbo.tab_GoodsType as d on d.Id=c.GoodsType
-	 where a.StoreNum>0 and (select Lx from dbo.tab_RackInfo as e where e.RackId=a.RackID)='试验台架'
-	 and (select FatherId from dbo.tab_GoodsType as g where g.Id=c.GoodsType)=30
-	 and RackId=?
+	select b.GoodsCode,c.GoodsName,a.GoodsTxm, c.GoodsType as bbb
+	from dbo.tab_GoodsInfo as b  
+	LEFT JOIN dbo.tab_GoodsKcWz as a ON a.GoodsTxm=b.GoodsTxm 
+	left join dbo.tab_GoodsCommon as c on c.GoodsBatch=b.GoodsCode 
+	left join dbo.tab_GoodsType as d on d.GoodsType=c.GoodsType 
+	where  RackID=?
+	AND (c.GoodsType<6 OR c.GoodsType=41)
+	AND a.StoreNum>0
 
 	"""
 	rows=cur.execute(sql_dev,TB_no).fetchall()
 	
 	print("Following info for " + TB_no+"<BR>")
 	if (len(rows)>0):
-		makejson(rows)
+		#makejson(rows)
 		print("<table border=1>")
 		print("<tr>")
 		for row in cur.description:
@@ -48,9 +75,13 @@ def infoget(TB_no,conn):
 		for w in rows:
 			print("<TR>")
 			#print("#".join(x for x in w)) #print(str(w).decode('GBK')+"<br>\n")
-			for i in w:
-				print("<TD>"+i+"</TD>")
-			print("</TR>")
+
+			if(int(w[3])==41):
+				sub_query(conn,w[2])
+			else:
+				for i in w:
+					print("<TD>"+i+"</TD>")
+				print("</TR>")
 			#print("<br>\n")
 		print("</table><hr>")
 	else:
