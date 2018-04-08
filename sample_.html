@@ -1,0 +1,85 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/dataTables.bootstrap.css" />
+<link rel="stylesheet" href="css/jquery.fullPage.css">
+<script src="http://bzo.bosch.com/bzo/media/js/jquery.js"></script>
+<script src="js/jquery.fullPage.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+    $(function(){
+        $.getJSON("/cgi-bin/getSQLjson.py",function(json){
+           
+            for(i=1;i<9;i++){
+                TB="TB"+i
+                $elm=$(".holder").clone(false).addClass('section').addClass('topdiv').removeClass('holder');
+                $elm.find("h1").html("Test bench " + i);
+                $elm.find("#Pump").html(json[TB]['1']);
+                $elm.find("#ECU").html(json[TB]["5"]);
+                $elm.find("#Rail").html(json[TB]["2"]);
+                $elm.find("#Injector").html(json[TB]["3"]);
+                $("body").append($elm);
+                //$("body").append($(".topdiv:first").clone(false).find("#Pump").html(json[TB]['1']))//.find("#ECU").html(json[TB]["5"]).find("#Rail").html(json[TB]["2"]).find("#Injector").html(json[TB]["3"]))
+            }
+        })
+        $("body").fullpage({
+		//sectionsColor: ['#000', '#000', '#000', '#000','#000','#000','#000','#000','#000'],
+		anchors: [ 'TB1', 'TB2', 'TB3','TB4','TB5','TB6','TB7','TB8']
+		//verticalCentered: true,
+		//continuousVertical: true
+		//loopBottom:true
+		})
+
+
+    })
+</script>
+<meta charset="utf-8">
+<style>
+    *{margin:0}
+
+td{font-size:18px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;height:120px;width:120px;text-align:center}
+
+body{background: rgba(28, 122, 70, 0.8)}
+.holder{display:none}
+.topdiv{width:800;height:100%;text-align:center;vertical-align:middle ;display:table;margin:auto auto;}
+.container{   height:auto;vertical-align:middle ;width:800;display:table-cell;text-align: center}
+.leftbar{width:400px;display:block;margin:0 auto;padding:0px;float:left;text-align:center;}
+.leftbar table{margin:0px auto; border-collapse: collapse}
+.rightPic{width:400px;display:block;margin:0 auto;padding:0px;margin-left:400px}
+.head{
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.2) 25%,
+        rgba(255,255,255,0.2) 75%,
+        rgba(255,255,255,0) 100%);
+        box-shadow: 0 0 25px rgba(255,255,255,0.1),inset 0 0 1px rgba(255,255,255,0.6);
+    )
+}
+.head h1{font-family: Arial, Helvetica, sans-serif;padding:10px;color:#FFF}
+</style>
+</head>
+<body>
+<div class="holder">
+    <div class='container'>
+    <div class='head'><h1>Test bench 1</h1></div>
+    <div class='infoboard'>
+        <Div class='leftbar'><table border>
+            <!--<tr><td>Components</td><td>Type</td></tr>-->
+            <tr><td><img src='images/pump_.png'></td><td id='Pump'>No info</td></tr>
+            <tr><td><img src='images/rail_.png'></td><td id='Rail'>No info</td></tr>
+            <tr><td><img src='images/ECU_.png'></td><td id='ECU'>No info</td></tr>
+            <tr><td><img src='images/injector_.png'></td><td id='Injector'>No info</td></tr>
+        </table></Div>
+
+        <div class='rightPic'>
+            <img src="images/liu_chao.jpg" style="display:block;margin:10 auto">
+            <img src="images/400x.png" style="display:block;margin:0 auto">
+        </div>
+        
+    </div>
+    </div>
+</div>
+</body>
+</html>

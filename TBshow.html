@@ -1,0 +1,241 @@
+<html>
+
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/dataTables.bootstrap.css" />
+<link rel="stylesheet" href="css/jquery.fullPage.css">
+
+
+<script src="http://bzo.bosch.com/bzo/media/js/jquery.js"></script>
+<script src="js/jquery.dataTables.min.js"></script>
+<script src="js/jquery-ui-1.10.3.min.js"></script>
+
+<script src="js/jquery.fullPage.js"></script>
+
+
+
+<script src="js/bootstrap.min.js"></script>
+<script>
+
+function reload(url){
+//update content by given json
+
+			$.getJSON("/"+url, function(jsobj){
+				//alert(jsobj)
+				var str="";
+				str+="<table class='imagetable' id='datatable'><thead><tr>"
+				for (x=0;x<parseInt(jsobj.info.days)+1;x++){
+					if(x==0){
+						str+="<th></th>"
+					}
+					else{
+						str+="<th>" + getdaystring(jsobj.info.firstd,x-1) +"</th>"
+					}
+				}
+				str+="</tr></thead><tbody>"
+				$.each(jsobj.data,function(i,s){
+						str+="<tr>"
+						var days=""
+						$.each(s,function(j,d){
+							days+= "<td>"+proString(d)+"</td>";						
+						})
+						str += "<td class='myTB'>"+ i +"</td>" + days + "</tr>";				
+					})
+				str+="</tbody></table>"
+				$('#plh').html(str);
+				
+				d=new Date(jsobj.info.firstd)
+				d=new Date(d.setDate(d.getDate()+parseInt(jsobj.info.days)-1))
+				y=d.getFullYear()
+				m=d.getMonth()+1
+				da=d.getDate()
+				d=y+"/"+m+"/"+da
+				$("TIT").html("Arrangement for "+jsobj.info.firstd + " to " + d)
+				for(i=1;i<12;i++){
+				_w_table_colspan("#datatable",i);
+				}
+
+			
+			
+			$('th').css("width","12.5%");
+			$('tr:contains(Quick)').hide();
+			
+			})
+
+}
+
+
+
+
+	$(document).ready(function(){
+		
+		url="TBarr.json"
+		
+		reload("TBarr.json?timestamp=" + new Date().getTime())
+
+
+		loadsql()
+		
+			//alert(location.href)		
+	})
+	
+	function loadsql(){
+		$.ajax( {
+				url: "/cgi-bin/getSQLdiv.py", 
+				type: "GET", 
+				success: function(data){
+					var result = $(data);
+					
+					$("#rolling").append(result);
+					makefull()
+					//$.fn.fullpage.reBuild()
+					//$.fn.fullpage.destroy(true);
+					setTimeout(autogo,10000)
+				}
+			});
+		
+	}
+	function makefull(){
+		$("#rolling").fullpage({
+		//sectionsColor: ['#000', '#000', '#000', '#000','#000','#000','#000','#000','#000'],
+		anchors: ['overview', 'TB1', 'TB2', 'TB3','TB4','TB5','TB6','TB7','TB8'],
+		verticalCentered: true,
+		continuousVertical: true
+		//loopBottom:true
+		})
+		//setTimeout(autogo,10000)
+
+	}
+
+		function autogo(){
+		$.fn.fullpage.moveSectionDown()
+			setTimeout(autogo,10000)
+		}
+		function getdaystring(strdate,offset){
+				d=new Date(strdate)
+				d=new Date(d.setDate(d.getDate()+offset))
+				y=d.getFullYear()
+				m=d.getMonth()+1
+				da=d.getDate()
+				return y+"/"+m+"/"+da
+		}
+
+
+</script>			
+
+    <script type="text/javascript">
+
+function _w_table_rowspan(_w_table_id,_w_table_colnum){
+    _w_table_firsttd = "";
+    _w_table_currenttd = "";
+    _w_table_SpanNum = 0;
+    _w_table_Obj = $(_w_table_id + " tr td:nth-child(" + _w_table_colnum + ")");
+    _w_table_Obj.each(function(i){
+        if(i==0){
+            _w_table_firsttd = $(this);
+            _w_table_SpanNum = 1;
+        }else{
+            _w_table_currenttd = $(this);
+			var s1=_w_table_firsttd.text().replace(/[\s]/img,"")
+			var s2=_w_table_currenttd.text().replace(/[\s]/img,"")
+            if(s1==s2){
+                _w_table_SpanNum++;
+                _w_table_currenttd.hide(); //remove();
+                _w_table_firsttd.attr("rowSpan",_w_table_SpanNum);
+            }else{
+                _w_table_firsttd = $(this);
+                _w_table_SpanNum = 1;
+            }
+        }
+    }); 
+}
+
+function _w_table_colspan(_w_table_id,_w_table_rownum,_w_table_maxcolnum){
+    if(_w_table_maxcolnum == void 0){_w_table_maxcolnum=0;}
+    _w_table_firsttd = "";
+    _w_table_currenttd = "";
+    _w_table_SpanNum = 0;
+    $(_w_table_id + " tr:nth-child(" + _w_table_rownum + ")").each(function(i){
+        _w_table_Obj = $(this).children();
+        _w_table_Obj.each(function(i){
+            if(i==0){
+                _w_table_firsttd = $(this);
+                _w_table_SpanNum = 1;
+            }else if((_w_table_maxcolnum>0)&&(i>_w_table_maxcolnum)){
+                return "";
+            }else{
+                _w_table_currenttd = $(this);
+                if(_w_table_firsttd.text()==_w_table_currenttd.text()){
+                    _w_table_SpanNum++;
+                    _w_table_currenttd.hide(); //remove();
+                    _w_table_firsttd.attr("colSpan",_w_table_SpanNum);
+                }else{
+                    _w_table_firsttd = $(this);
+                    _w_table_SpanNum = 1;
+                }
+            }
+        });
+    });
+}
+function proString(s){
+//return s
+return s.replace(/\s*-{1,2}>.*$/gim,"")
+}
+
+
+</script>
+
+<style>
+.sin{text-align: center;margin:0 auto;font-size:24px}
+TD{font-size:12px}
+table.imagetable {  
+    font-family: verdana,arial,sans-serif;  
+    font-size:11px;  
+    color:#333333;  
+    border-width: 1px;  
+    border-color: #999999;  
+    border-collapse: collapse;  
+}  
+table.imagetable th {  
+    background:#b5cfd2 url('images/cell-blue.jpg');  
+    border-width: 1px;  
+    padding: 8px;  
+    border-style: solid;  
+    border-color: #999999;  
+}  
+table.imagetable td {  
+    background:#dcddc0 url('images/cell-grey.jpg'); 
+    border-width: 1px;  
+    padding: 8px;  
+    border-style: solid;  
+    border-color: #999999;  
+} 
+
+
+</style>
+
+
+</head>
+
+<body>
+<div id="rolling">
+<div class="section">
+<div class="container" >
+<div class="container"><H2>ESD1 test bench arrangement system<img class="pull-right imgresponsive center-block" id="logopng" src="images/logo_bosch.gif"></H2></div>
+
+
+<div id="nav" class="navbar"><ul class=breadcrumb ><li><TIT></TIT></li></ul></div>
+
+<div id="plh" class="plh"></div>
+
+
+<div class="page_foot">Copy right RBCD/ESD1 2017 Designed by Tang Zhongji</div>
+
+</div>
+</div>
+</div>
+</body>
+
+</html>
