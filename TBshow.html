@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="utf-8">
-
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="css/dataTables.bootstrap.css" />
 <link rel="stylesheet" href="css/jquery.fullPage.css">
@@ -19,7 +19,7 @@
 
 <script src="js/bootstrap.min.js"></script>
 <script>
-
+debug=true;
 function reload(url){
 //update content by given json
 
@@ -97,43 +97,28 @@ function reload(url){
 			   //$("body").append($(".topdiv:first").clone(false).find("#Pump").html(json[TB]['1']))//.find("#ECU").html(json[TB]["5"]).find("#Rail").html(json[TB]["2"]).find("#Injector").html(json[TB]["3"]))
 		   }
 		   $(".holder").remove();
+		   $("#wait").remove();
 		   //console.log($(window).height())
 		   //setTimeout(() => {
 		   $("#rolling").fullpage({
-			   sectionsColor: ['#FFF','#39C', '#9CF', '#CFF', '#9CC','#39C', '#9CF', '#CFF', '#9CC'],
+			   //sectionsColor: ['#FFF','#39C', '#9CF', '#CFF', '#9CC','#39C', '#9CF', '#CFF', '#9CC'],
 			   anchors: [ 'overview','TB1', 'TB2', 'TB3','TB4','TB5','TB6','TB7','TB8'],
 			   verticalCentered: true,
 			   //continuousVertical: true
 			   loopBottom:true
 		   })
 		   //}, 0000);
-		   setInterval(()=>{
-			   $.fn.fullpage.moveSectionDown();
-		   },10000);
-		   
+			if(!debug){
+					setInterval(()=>{
+						$.fn.fullpage.moveSectionDown();
+					},10000);
+			}
 		   //console.log($(window).height())
 		   
 	   })
 	}
 
-	/*
-	function makefull(){
-		$("#rolling").fullpage({
-		//sectionsColor: ['#000', '#000', '#000', '#000','#000','#000','#000','#000','#000'],
-		anchors: ['overview', 'TB1', 'TB2', 'TB3','TB4','TB5','TB6','TB7','TB8'],
-		verticalCentered: true,
-		continuousVertical: true
-		//loopBottom:true
-		})
-		//setTimeout(autogo,10000)
 
-	}
-
-		function autogo(){
-		$.fn.fullpage.moveSectionDown()
-			setTimeout(autogo,10000)
-		}
-	*/
 		function getdaystring(strdate,offset){
 				d=new Date(strdate)
 				d=new Date(d.setDate(d.getDate()+offset))
@@ -202,7 +187,7 @@ function _w_table_colspan(_w_table_id,_w_table_rownum,_w_table_maxcolnum){
 }
 function proString(s){
 //return s
-return s.replace(/\s*-{1,2}>.*$/gim,"")
+return s.replace(/\s*-{1,2}>.*$/gim,"").replace(/^[pP][\d]*\.[\d]?\s*/gim,"").replace(/\s*\/\s*\w*_\w*[,]?\s*\w*\s*$/gim,"")
 }
 
 
@@ -220,24 +205,23 @@ table.imagetable {
     border-collapse: collapse;  
 }  
 table.imagetable th {  
-    background:#b5cfd2 url('images/cell-blue.jpg');  
+    background:#b5cfd2;  
     border-width: 1px;  
     padding: 8px;  
     border-style: solid;  
     border-color: #999999;  
 }  
 table.imagetable td {  
-    background:#dcddc0 url('images/cell-grey.jpg'); 
+    background:#dcddc0; 
     border-width: 1px;  
     padding: 8px;  
     border-style: solid;  
     border-color: #999999;  
 } 
-.leftbar table td{font-size:18px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;height:120px;width:120px;text-align:center}
 .holder{display:none;}
 #out{}
 /*.topdiv{width:800;height:100%;text-align:center;margin:0 auto;}*/
-.container{height:700;width:800;text-align: center}
+.container{height:700;width:800;}
 .leftbar{width:400px;display:block;margin:0 auto;padding:0px;float:left;text-align:center;}
 .leftbar table{margin:0px auto; border-collapse: collapse}
 .rightPic{width:400px;display:block;margin:0 auto;padding:0px;margin-left:400px;text-align:center;}
@@ -245,22 +229,42 @@ table.imagetable td {
 .head{
     background: linear-gradient(
         90deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.2) 25%,
-        rgba(255,255,255,0.2) 75%,
-        rgba(255,255,255,0) 100%);
-        box-shadow: 0 0 25px rgba(255,255,255,0.1),inset 0 0 1px rgba(255,255,255,0.6);
-    )
-}
+        rgba(19, 4, 233, 0) 0%,
+        rgba(19, 4, 233,0.2) 25%,
+        rgba(19, 4, 233,0.2) 75%,
+        rgba(19, 4, 233,0) 100%);
+        box-shadow: 0 0 25px rgba(19, 4, 233,0.1),inset 0 0 1px rgba(19, 4, 233,0.6);
+    )}
 
-.head h1{font-family: Arial, Helvetica, sans-serif;padding:10px;}
-#pump{position: relative;left:-120px}
+.head h1{font-family: Arial, Helvetica, sans-serif;padding:10px;text-align:center;color:white;}
+#pump{display:inline-block;position: relative;left:-120px}
+
+ul li{display:block}
+div.hover{position: relative;
+display:block;
+width:120px;
+height:30px;
+background-color:rgba(16, 80, 110, 0.39);
+left:120px;
+top:-30px;
+color:#FFF;
+line-height: 30px;
+}
+.pump,.injector{position: relative;left:100px}
+.hover#Pump,.hover#Injector{left:220px !important;}
+.section{background:url('images/supergfx.png');
+background-size:100%;
+background-position:0 -550px;
+background-repeat:no-repeat;
+}
+#wait{text-align:center;height:100%;width:100%;display:block;}
 </style>
 
 
 </head>
 
 <body>
+<div id="wait">Loading...</div>
 <div id="rolling">
 <div class="section">
 <div class="container" >
@@ -281,13 +285,14 @@ table.imagetable td {
         <div class='container'>
         <div class='head'><h1>Test bench 1</h1></div>
         <div class='infoboard'>
-            <Div class='leftbar'><table border>
-                <!--<tr><td>Components</td><td>Type</td></tr>-->
-                <tr><td><img src='images/pump_.png'></td><td id='Pump'>No info</td></tr>
-                <tr><td><img src='images/rail_.png'></td><td id='Rail'>No info</td></tr>
-                <tr><td><img src='images/ECU_.png'></td><td id='ECU'>No info</td></tr>
-                <tr><td><img src='images/injector_.png'></td><td id='Injector'>No info</td></tr>
-            </table></Div>
+            <Div class='leftbar'>
+				<ul class="crs">
+					<li><img src='images/pump_.png' class="pump"><div class="hover" id='Pump'>No info</div></li>
+					<li><img src='images/rail_.png' class="rail"><div class="hover" id='Rail'>No info</div></li>
+					<li><img src='images/ECU_.png' class="ECU"><div class="hover" id='ECU'>No info</div></li>
+					<li><img src='images/injector_.png' class="injector"><div class="hover" id='Injector'>No info</div></li>
+				</ul>
+            </Div>
 
             <div class='rightPic'>
                 <img src="images/liu_chao.jpg" style="display:block;margin:0 auto;padding:10px 0px 10px 0px">
