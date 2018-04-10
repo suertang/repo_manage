@@ -1,37 +1,53 @@
-Private Function pvPostFile(sUrl As String, sFileName As String, Optional ByVal bAsync As Boolean) As String
-    Const STR_BOUNDARY  As String = "3fbd04f5-b1ed-4060-99b9-fca7ff59c113"
-    Dim nFile           As Integer
-    Dim baBuffer()      As Byte
-    Dim sPostData       As String
- 
-    '--- read file
-    nFile = FreeFile
-    Open sFileName For Binary Access Read As nFile
-    If LOF(nFile) > 0 Then
-        ReDim baBuffer(0 To LOF(nFile) - 1) As Byte
-        Get nFile, , baBuffer
-        sPostData = StrConv(baBuffer, vbUnicode)
-    End If
-    Close nFile
-    '--- prepare body
-    sPostData = "--" & STR_BOUNDARY & vbCrLf & _
-        "Content-Disposition: form-data; name=""uploadfile""; filename=""" & Mid$(sFileName, InStrRev(sFileName, "\") + 1) & """" & vbCrLf & _
-        "Content-Type: application/octet-stream" & vbCrLf & vbCrLf & _
-        sPostData & vbCrLf & _
-        "--" & STR_BOUNDARY & "--"
-    '--- post
-    With CreateObject("Microsoft.XMLHTTP")
-        .Open "POST", sUrl, bAsync
-        .SetRequestHeader "Content-Type", "multipart/form-data; boundary=" & STR_BOUNDARY
-        .Send pvToByteArray(sPostData)
-        If Not bAsync Then
-            pvPostFile = .ResponseText
-        End If
-    End With
+作者：付杨
+链接：https://www.zhihu.com/question/40974557/answer/145193012
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+Private Function ToHexString(ByRef buf() As Byte) As String
+    Dim i As Long, j As Long
+    Dim nlen As Long
+    Dim tmpHex As String
+    Dim HexStr As String
+    Dim tmpbuf() As Byte
+    nlen = (UBound(buf) + 1) * 2
+    ReDim tmpbuf(nlen - 1)
+    j = 0
+    For i = 0 To UBound(buf)
+        HexStr = Hex(buf(i))
+        If Len(HexStr) = 1 Then HexStr = "0" & HexStr
+        tmpbuf(j) = Asc(Mid(HexStr, 1, 1))
+        j = j + 1
+        tmpbuf(j) = Asc(Mid(HexStr, 2, 1))
+        j = j + 1
+    Next
+    ToHexString = StrConv(tmpbuf, vbUnicode)
 End Function
- 
-Private Function pvToByteArray(sText As String) As Byte()
-    pvToByteArray = StrConv(sText, vbFromUnicode)
-End Function
+
+Private Sub PostFile(ByVal PUrl As String, ByVal PFile As String)
+Dim PostData, Boundary As String
+Dim Upload_File  As String
+Dim Http As Object
+Dim fn As Integer
+Dim fbuf() As Byte
+Upload_File = PFile
+'------------------打开Adodb.stream 流读取二进制文件------------------
+fn = FreeFile()
+ReDim fbuf(FileLen(Upload_File) - 1)
+Open Upload_File For Binary As #fn
+Get #fn, , fbuf
+Close #fn
+'-----------------构造POST数据 ----------------------
+Boundary = "----WebKitFormBoundary1iVXNONaGEDOCghI"
+PostData = "--" & Boundary & vbCrLf
+PostData = PostData & "Content-Disposition: form-data; name=file; filename=F:\Work\E盘\mydata\VBSource\FrontClient2012 For SQL SERVER\20170208000018010000.jpg; payje=4.9; paytype=; payxsdbh=20170208000018010000; payxssj=15:53:40; payfdbh=0000;" & vbCrLf
+PostData = PostData & "Content-Type: application/x-jpg" & vbCrLf
+PostData = PostData & "" & vbCrLf
+PostData = PostData & ToHexString(fbuf) & vbCrLf     '写入文件二进制内容PostData = PostData & "--" & Boundary & vbCrLf'---------------发送数据包-------------------------------------
+Set Http = CreateObject("Msxml2.XMLHTTP")
+Http.Open "POST", PUrl, True
+Http.setRequestHeader "Content-Type", "multipart/form-data; boundary=" & Boundary
+Http.send PostData
+End Sub
+
 
 
