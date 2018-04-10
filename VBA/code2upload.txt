@@ -1,0 +1,51 @@
+Private Function pvPostFile(sUrl As String, sString As String, Optional ByVal bAsync As Boolean) As String
+    Const STR_BOUNDARY  As String = "3fbd04f5-b1ed-4060-99b9-fca7ff59c113"
+    'Dim nFile           As Integer
+    'Dim baBuffer()      As Byte
+    Dim sPostData       As String
+ 
+    '--- read file
+    'nFile = FreeFile
+    'Open sFileName For Binary Access Read As nFile
+    'If LOF(nFile) > 0 Then
+    '    ReDim baBuffer(0 To LOF(nFile) - 1) As Byte
+    '    Get nFile, , baBuffer
+    '    sPostData = StrConv(baBuffer, vbUnicode)
+    'End If
+    'Close nFile
+    
+    sPostData = sString
+    '--- prepare body
+    sPostData = "--" & STR_BOUNDARY & vbCrLf & _
+        "Content-Disposition: form-data; name=""data""; filename=""TBarr.json""" & vbCrLf & _
+        "Content-Type: application/octet-stream" & vbCrLf & vbCrLf & _
+        sPostData & vbCrLf & _
+        "--" & STR_BOUNDARY & "--"
+    '--- post
+    With CreateObject("Microsoft.XMLHTTP")
+        .Open "POST", sUrl, bAsync
+        .SetRequestHeader "Content-Type", "multipart/form-data; boundary=" & STR_BOUNDARY
+        .Send pvToByteArray(sPostData)
+        If Not bAsync Then
+            pvPostFile = .ResponseText
+        End If
+    End With
+End Function
+ 
+Private Function pvToByteArray(sText As String) As Byte()
+    pvToByteArray = StrConv(sText, vbFromUnicode)
+End Function
+
+Sub updata()
+Dim d As Date
+d = Date
+w = DateDiff("w", #1/1/2018#, d) + 1
+If w < 10 Then w = "0" & w
+Sheets("18-" & w).Activate
+res = pvPostFile("http://localhost:8080/upload", getjson())
+If UCase(res) = "OK" Then
+    MsgBox "Json successfully uploaded to server."
+Else
+    MsgBox "Sorry, not uploaded!"
+End If
+End Sub
